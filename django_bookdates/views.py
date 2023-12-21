@@ -1,6 +1,7 @@
 from django.shortcuts import get_object_or_404
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from django.views.generic.list import ListView
+from django.views.generic import View
 from django.urls import reverse
 
 from django_bookdates.models import Timespan
@@ -79,3 +80,11 @@ class ListTimespans(CalendarMixin, ListView):
         context['weekafter'] = date + datetime.timedelta(days=7)
         context['fourweeksfromdatedict'] = [{'date': date, 'timespans': self.get_timespans_on_date(date), 'is_today': date.year == today.year and date.month == today.month and date.day == today.day } for date in datelist ]
         return context
+
+
+class Ical(CalendarMixin, ListView):
+    model = Timespan
+    template_name_suffix = "_ical"
+
+    def get_queryset(self):
+        return Timespan.objects.filter(calendar=self.calendar)

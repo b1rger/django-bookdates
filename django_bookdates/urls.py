@@ -13,7 +13,8 @@ urlpatterns = [
                  path('create', views.CreateTimespan.as_view(), name='createtimespan'),
                  path('delete/<uuid:pk>', views.DeleteTimespan.as_view(), name='deletetimespan'),
                  path('update/<uuid:pk>', views.UpdateTimespan.as_view(), name='updatetimespan'),
+                 path('ical', views.Ical.as_view(), name='ical'),
              ]
          )
-    )
+    ),
 ]
