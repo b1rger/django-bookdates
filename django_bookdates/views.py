@@ -20,7 +20,6 @@ class CalendarMixin:
     def get_context_data(self, *args, **kwargs):
         context = super().get_context_data(*args, **kwargs)
         context['calendar'] = self.calendar
-        context['upcoming'] = self.get_queryset().filter(end__gt=datetime.datetime.today())
         return context
 
 
@@ -59,11 +58,12 @@ class UpdateTimespan(CalendarMixin, UpdateView):
 
 class ListTimespans(CalendarMixin, ListView):
     model = Timespan
-    queryset = Timespan.objects.filter(end__gte=datetime.datetime.today())
+
+    def get_queryset(self):
+        return Timespan.objects.filter(calendar=self.calendar)
 
     def get_timespans_on_date(self, date):
-        timespans = Timespan.objects.filter(start__lte=date.date(), end__gte=date.date())
-        return timespans
+        return self.get_queryset().filter(start__lte=date.date(), end__gte=date.date())
 
     def get_context_data(self, **kwargs):
         today = datetime.datetime.today()
@@ -78,4 +78,5 @@ class ListTimespans(CalendarMixin, ListView):
         context['weekbefore'] = date + datetime.timedelta(days=-7)
         context['weekafter'] = date + datetime.timedelta(days=7)
         context['fourweeksfromdatedict'] = [{'date': date, 'timespans': self.get_timespans_on_date(date), 'is_today': date.year == today.year and date.month == today.month and date.day == today.day } for date in datelist ]
+        context['upcoming'] = self.get_queryset().filter(end__gt=datetime.datetime.today())
         return context
